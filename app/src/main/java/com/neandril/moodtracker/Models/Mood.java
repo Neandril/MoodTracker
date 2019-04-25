@@ -8,27 +8,30 @@ import java.util.Date;
 
 /**
  * Class used to create moods
- * @smiley
- * @background
- * @comment
- * @date
- * @id
+ * @smiley - The mood picture displayed
+ * @background - Background, according to the mood
+ * @comment - Commentary
+ * @date - Date
+ * @id - The idendifier of the mood
  */
 public class Mood {
 
     private int icon;
     private int background;
     private Date date;
-    private String text;
+    private String comment;
     private int id;
 
-    public Mood(int icon, int background, Date date, String text, int id) {
+    // Constructor
+    public Mood(int icon, int background, Date date, String comment, int id) {
         this.icon = icon;
         this.background = background;
         this.date = date;
-        this.text = text;
+        this.comment = comment;
         this.id = id;
     }
+
+    // Getters and Setters
 
     public int getIcon() {
         return icon;
@@ -55,11 +58,11 @@ public class Mood {
     }
 
     public String getText() {
-        return text;
+        return comment;
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.comment = text;
     }
 
     public int getId() {
