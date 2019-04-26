@@ -1,6 +1,8 @@
 package com.neandril.moodtracker.Activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +30,11 @@ public class MainActivity extends AppCompatActivity {
     // Tag for activity
     public static final String TAG = "MainActivity";
 
+    public static final String PREFS_MOOD = "PREFS_MOOD";
+    public static final String PREFS_MOOD_ID = "PREFS_MOOD_ID";
+    public static final String PREFS_MOOD_COM = "PREFS_MOOD_COM";
+    SharedPreferences sharedPreferences;
+
     private int tmp;
 
     @Override
@@ -43,7 +50,24 @@ public class MainActivity extends AppCompatActivity {
         // Attach adapter
         mRecyclerView.setAdapter(new MoodAdapter(mMoods));
 
+        // Check if sharedpreference contains a value
+        sharedPreferences = getBaseContext().getSharedPreferences(PREFS_MOOD, MODE_PRIVATE);
+        if (sharedPreferences.contains(PREFS_MOOD_ID) && sharedPreferences.contains(PREFS_MOOD_COM)){
+            // If a mood was picked up, scroll to its position
+            int pos = sharedPreferences.getInt(PREFS_MOOD_ID, 0);
+            String com = sharedPreferences.getString(PREFS_MOOD_COM, null);
+            Log.e(TAG, "sharedpreference : " + pos);
+            Log.e(TAG, "sharedpreference : " + com);
+            mRecyclerView.scrollToPosition(pos -1);
+
+        } else {
+            Log.e(TAG, "No sharedpreference yet");
+        }
+
         // Call methods
+        if (isNewDay()) {
+            mRecyclerView.scrollToPosition(0);
+        }
         updateUi();
         configureOnClickRecyclerView();
     }
@@ -62,15 +86,25 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Check if a new day begins
      */
-    private void isNewDay() {
+    private boolean isNewDay() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastTimeStarted = settings.getInt("last_time_started", -1);
         Calendar calendar = Calendar.getInstance();
-        int hours = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        int seconds = calendar.get(Calendar.SECOND);
+        int today = calendar.get(Calendar.DAY_OF_YEAR);
 
-        if (hours*3600 + minutes*60 + seconds < 1800 ) {
-            // It's a new day
+        if (today != lastTimeStarted) {
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt("last_time_started", today);
+            editor.apply();
+            sharedPreferences
+                    .edit()
+                    .remove(PREFS_MOOD_ID).remove(PREFS_MOOD_COM)
+                    .apply();
+            Log.e(TAG, "New day !");
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -81,8 +115,14 @@ public class MainActivity extends AppCompatActivity {
                 .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
                     @Override
                     public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-
-                        Log.e(TAG, "Position : " + position);
+                        int id = mMoods.get(position).getId();
+                        String com = mMoods.get(position).getText();
+                        sharedPreferences
+                                .edit()
+                                .putInt(PREFS_MOOD_ID, id)
+                                .putString(PREFS_MOOD_COM, com)
+                                .apply();
+                        Log.e(TAG, "Position : " + mMoods.get(position).getId());
                     }
                 });
     }

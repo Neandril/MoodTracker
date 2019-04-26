@@ -36,8 +36,6 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         return new RecyclerViewHolder(view);
     }
 
-    //c'est ici que nous allons remplir notre cellule avec le texte/image de chaque MyObjects
-
     /**
      * Bind ViewHolder, and fill all that's necessary
      * @param viewHolder - the viewholder
@@ -47,13 +45,6 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     public void onBindViewHolder(RecyclerViewHolder viewHolder, int position) {
         Mood myObject = mMoodList.get(position);
         viewHolder.bind(myObject);
-
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.e(TAG, "Clicked !");
-            }
-        });
     }
 
     /**
