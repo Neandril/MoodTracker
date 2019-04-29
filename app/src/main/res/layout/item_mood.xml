@@ -15,12 +15,4 @@
         android:layout_centerInParent="true"
         android:src="@drawable/smiley_super_happy"/>
 
-    <TextView
-        android:id="@+id/mTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textSize="42sp"
-        android:text=""/>
-
 </RelativeLayout>

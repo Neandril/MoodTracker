@@ -11,7 +11,6 @@ import com.neandril.moodtracker.R;
 
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    private TextView mTextView;
     private ImageView mImageView;
     private RelativeLayout mRelativeLayout;
 
@@ -23,7 +22,6 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
         // ... with objects (in xml)
         mRelativeLayout = itemView.findViewById(R.id.item_layout);
-        mTextView = itemView.findViewById(R.id.mTextView);
         mImageView = itemView.findViewById(R.id.smiley_icon);
     }
 
@@ -32,7 +30,6 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
      * @param mood retrieve data to be displayed about moods
      */
     public void bind(final Mood mood){
-        mTextView.setText(mood.getText());
         mImageView.setImageResource(mood.getIcon());
         mRelativeLayout.setBackgroundResource(mood.getBackground());
     }

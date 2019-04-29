@@ -57,12 +57,12 @@ public class Mood {
         this.date = date;
     }
 
-    public String getText() {
+    public String getComment() {
         return comment;
     }
 
-    public void setText(String text) {
-        this.comment = text;
+    public void setComment(String text) {
+        this.comment = comment;
     }
 
     public int getId() {
