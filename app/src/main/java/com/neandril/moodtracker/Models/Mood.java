@@ -1,9 +1,5 @@
 package com.neandril.moodtracker.Models;
 
-import com.neandril.moodtracker.R;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**

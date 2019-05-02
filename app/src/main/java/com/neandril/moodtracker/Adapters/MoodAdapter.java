@@ -1,7 +1,6 @@
 package com.neandril.moodtracker.Adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +10,10 @@ import com.neandril.moodtracker.R;
 import com.neandril.moodtracker.Views.RecyclerViewHolder;
 
 import java.util.List;
+
+/**
+ * Adapter class for RecyclerView
+ */
 
 public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
@@ -55,9 +58,5 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     @Override
     public int getItemCount() {
         return mMoodList.size();
-    }
-
-    public Mood getMood(int position) {
-        return this.mMoodList.get(position);
     }
 }

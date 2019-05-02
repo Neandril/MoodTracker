@@ -9,6 +9,10 @@ import android.widget.TextView;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
+/**
+ * ViewHolder class for the RecyclerView
+ */
+
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
     private ImageView mImageView;

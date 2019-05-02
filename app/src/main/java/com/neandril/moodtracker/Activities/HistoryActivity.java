@@ -7,6 +7,10 @@ import com.neandril.moodtracker.R;
 
 public class HistoryActivity extends AppCompatActivity {
 
+    /**
+     * In dev
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

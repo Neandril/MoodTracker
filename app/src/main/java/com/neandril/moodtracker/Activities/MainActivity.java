@@ -19,6 +19,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.neandril.moodtracker.Adapters.MoodAdapter;
+import com.neandril.moodtracker.Helpers.PrefHelper;
+import com.neandril.moodtracker.Helpers.SaveMoodHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
@@ -27,56 +29,39 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Entry point of the app
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     // Declarations
     private RecyclerView mRecyclerView;
-    private List<Mood> mMoods = new ArrayList<>();
+    private ArrayList<Mood> mMoods = new ArrayList<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
-    private MoodAdapter adapter;
     private Date currentTime = Calendar.getInstance().getTime();
     private String mComment;
-    private Date mDate;
     private int positionId;
+    SaveMoodHelper saveMoodHelper;
 
     LinearLayoutManager mLinearLayoutManager;
 
-    // Tag for activity
+    // Tag for activity's log
     public static final String TAG = "MainActivity";
-
-    public static final String PREFS_MOOD = "PREFS_MOOD";
-    public static final String PREFS_MOOD_ID = "PREFS_MOOD_ID";
-    public static final String PREFS_MOOD_COM = "PREFS_MOOD_COM";
-    public static final String PREFS_MOOD_DATE = "PREFS_MOOD_DATE";
-    public static final String PREFS_HIST_MOODS = "PREFS_HIST_MOODS";
-    SharedPreferences sharedPreferences;
-    SharedPreferences hSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rvMoods);
-        commentBtn = (ImageButton) findViewById(R.id.commentBtn);
-        histBtn = (ImageButton) findViewById(R.id.historyBtn);
+        saveMoodHelper = new SaveMoodHelper(this);
 
-        // Define layoutManager
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+        /**
+         // Check if sharedpreference contains a value
+         sharedPreferences = getBaseContext().getSharedPreferences(PREFS_MOOD, MODE_PRIVATE);
 
-        // Attach adapter
-        mRecyclerView.setAdapter(new MoodAdapter(mMoods));
-
-        // Attach a snapHelper (android.v7)
-        SnapHelper snapHelper = new PagerSnapHelper();
-        snapHelper.attachToRecyclerView(mRecyclerView);
-
-        // Check if sharedpreference contains a value
-        sharedPreferences = getBaseContext().getSharedPreferences(PREFS_MOOD, MODE_PRIVATE);
-
-        if (sharedPreferences.contains(PREFS_MOOD_ID) && sharedPreferences.contains(PREFS_MOOD_COM)){
+         if (sharedPreferences.contains(PREFS_MOOD_ID) && sharedPreferences.contains(PREFS_MOOD_COM)){
             // If a mood was picked up, scroll to its position
             int pos = sharedPreferences.getInt(PREFS_MOOD_ID, 0);
             String com = sharedPreferences.getString(PREFS_MOOD_COM, "");
@@ -88,12 +73,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.e(TAG, "No sharedpreference yet");
         }
+         **/
 
-        // Call methods
-        if (isNewDay()) {
-            mRecyclerView.scrollToPosition(0);
-        }
-
+        configureRecyclerView();
         updateUi();
         configureCommentBtn();
         configureHistBtn();
@@ -111,6 +93,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Method configuring the RecyclerView
+     */
+    private void configureRecyclerView() {
+        mRecyclerView = (RecyclerView) findViewById(R.id.rvMoods);
+        commentBtn = (ImageButton) findViewById(R.id.commentBtn);
+        histBtn = (ImageButton) findViewById(R.id.historyBtn);
+
+        // Define layoutManager
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLinearLayoutManager);
+
+        // Attach adapter
+        mRecyclerView.setAdapter(new MoodAdapter(mMoods));
+
+        // Attach a snapHelper (android.v7)
+        SnapHelper snapHelper = new PagerSnapHelper();
+        snapHelper.attachToRecyclerView(mRecyclerView);
+
+        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
+        if (moodArrayList == null) {
+            moodArrayList = new ArrayList<>();
+            mRecyclerView.scrollToPosition(0);
+        } else {
+            positionId = moodArrayList.get(moodArrayList.size() -1).getId();
+            mRecyclerView.scrollToPosition(positionId);
+        }
+
+        // Call methods
+        if (isNewDay()) {
+            mRecyclerView.scrollToPosition(0);
+        }
+    }
+
+    /**
      * Check if a new day begins
      */
     private boolean isNewDay() {
@@ -123,10 +139,6 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt("last_time_started", today);
             editor.apply();
-            sharedPreferences
-                    .edit()
-                    .remove(PREFS_MOOD_ID)
-                    .apply();
 
             Log.e(TAG, "New day !");
             return true;
@@ -135,7 +147,9 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    // Show an alertDialog allowing user to write a comment about his mood
+    /**
+     * Add a comment button
+     */
     private void configureCommentBtn() {
         commentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,12 +162,10 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton(R.string.positiveBtn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
-                        mDate = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getDate();
+                        PrefHelper.getNewInstance(getApplicationContext());
                         mComment = input.getText().toString();
                         mMoods.get(positionId).setComment(mComment);
-
-                        saveHistoryMoods(mComment, mDate);
+                        saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
                     }
                 });
                 builder.setNegativeButton(R.string.negativeBtn, new DialogInterface.OnClickListener() {
@@ -167,45 +179,41 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Run history activity when button is clicked
+    /**
+     * Launch history activity
+     * coming soon
+     */
     private void configureHistBtn() {
         histBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                startActivity(intent);
+                // Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                // startActivity(intent);
+                ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
+                Log.e("SaveMoodHelper", "Array : " + moodArrayList);
             }
         });
     }
 
-    // If activity is paused, save current mood
+    /**
+     * Life cycle methods
+     */
+    // When paused
     @Override
     protected void onPause() {
         super.onPause();
-        sharedPreferences
-                .edit()
-                .putInt(PREFS_MOOD_ID, positionId)
-                .apply();
+        positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
+        Log.e(TAG, "MOOD ID : " + positionId + " - COMMENT : " + mComment);
+        saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
     }
 
-    // If activity is destroyed, save current mood
+    // When destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
-        sharedPreferences
-                .edit()
-                .putInt(PREFS_MOOD_ID, positionId)
-                .apply();
     }
 
-    public void saveHistoryMoods(String mComment, Date date) {
-        positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
-        sharedPreferences
-                .edit()
-                .putInt(PREFS_MOOD_ID, positionId)
-                .putString(PREFS_MOOD_COM, mComment)
-                .putString(PREFS_MOOD_DATE, date.toString())
-                .apply();
-    }
+    /**
+     *
+     */
 }
