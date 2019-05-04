@@ -14,12 +14,12 @@ public class Mood {
 
     private int icon;
     private int background;
-    private Date date;
+    private String date;
     private String comment;
     private int id;
 
     // Constructor
-    public Mood(int icon, int background, Date date, String comment, int id) {
+    public Mood(int icon, int background, String date, String comment, int id) {
         this.icon = icon;
         this.background = background;
         this.date = date;
@@ -45,11 +45,11 @@ public class Mood {
         this.background = background;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import com.neandril.moodtracker.Models.Mood;
 
 import java.lang.reflect.Type;
+import java.nio.channels.CancelledKeyException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,12 +36,19 @@ public class SaveMoodHelper {
      * Get the current date
      * @return current date
      */
-    private Date getCurrentDate() {
+    private String getCurrentDate() {
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
+        String strDate = format.format(today);
+
+        return strDate;
+        /**
         Date date;
-        DateFormat outputFormatter = new SimpleDateFormat("dd/MM/YYYY", Locale.getDefault());
+        DateFormat outputFormatter = new SimpleDateFormat("MM/dd/YYYY", Locale.getDefault());
         date = Calendar.getInstance().getTime();
         date = new Date(outputFormatter.format(date));
         return date;
+         **/
     }
 
     /**
@@ -48,17 +56,15 @@ public class SaveMoodHelper {
      * @param currentMood
      */
     public void saveCurrentMood(Mood currentMood) {
+
         currentMood.setDate(getCurrentDate());
+        Log.e("SaveMoodHelper", getCurrentDate());
 
         // Initialize a new instance of the pref helper
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
         ArrayList<Mood> moodArrayList = prefHelper.retrieveMoodList();
 
-        // If the array is null or empty, create a new one
-        if (moodArrayList == null) {
-            moodArrayList = new ArrayList<>();
-        }
-        // Remove the last item if the list is not null, and is the same date
+        // Remove the last item if the list is not null, and if it's the same date
         if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(getCurrentDate())) {
             moodArrayList.remove(moodArrayList.size() -1);
         }
@@ -75,7 +81,7 @@ public class SaveMoodHelper {
         // Finally save the array
         prefHelper.saveMoodList(moodArrayList);
 
-        Log.e("SaveMoodHelper", "Saved ! " + moodArrayList.get(0).getId());
+        Log.e("SaveMoodHelper", "Saved ! " + moodArrayList.get(0).getComment());
 
         // Below, older code, just a remember; will be deleted
         /**

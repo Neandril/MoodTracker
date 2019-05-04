@@ -18,12 +18,15 @@ import java.util.ArrayList;
 public class PrefHelper {
 
     private static PrefHelper newInstance;
-    public static final String MOOD_LIST = "MOOD_LIST";
+    private static final String MOOD_LIST = "MOOD_LIST";
+    private static final String PREFS_MOOD = "PREFS_MOOD";
     private static SharedPreferences sSharedPreferences;
+    private ArrayList<Mood> moodArrayList;
+    Gson gson;
 
     private PrefHelper(Context context) {
-        String PREFS_MOOD = "PREFS_MOOD";
         sSharedPreferences = context.getSharedPreferences(PREFS_MOOD, Context.MODE_PRIVATE);
+        gson = new Gson();
     }
 
     /**
@@ -44,7 +47,6 @@ public class PrefHelper {
      */
     void saveMoodList(ArrayList<Mood> moods) {
         SharedPreferences.Editor editor = sSharedPreferences.edit();
-        Gson gson = new Gson();
         String json = gson.toJson(moods);
         editor.putString(MOOD_LIST, json);
         editor.apply();
@@ -55,14 +57,13 @@ public class PrefHelper {
      * @return an Array containing saved moods infos
      */
     public ArrayList<Mood> retrieveMoodList() {
-        Gson gson = new Gson();
-        String json= sSharedPreferences.getString(MOOD_LIST, "");
 
-        ArrayList<Mood> moodArrayList;
+        String json= sSharedPreferences.getString(MOOD_LIST, "[]");
 
-        if (json != null && json.length() < 1){
+        if (json == null || json.isEmpty()) {
             moodArrayList = new ArrayList<>();
         } else {
+            moodArrayList = new ArrayList<>();
             Type type = new TypeToken<ArrayList<Mood>>() {}.getType();
             moodArrayList = gson.fromJson(json, type);
         }

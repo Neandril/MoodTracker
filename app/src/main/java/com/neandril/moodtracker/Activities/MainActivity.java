@@ -24,10 +24,12 @@ import com.neandril.moodtracker.Helpers.SaveMoodHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Entry point of the app
@@ -75,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
         }
          **/
 
-        configureRecyclerView();
         updateUi();
+        configureRecyclerView();
         configureCommentBtn();
         configureHistBtn();
     }
@@ -85,11 +87,11 @@ public class MainActivity extends AppCompatActivity {
      * Fill the RecyclerView with diffents moods (created through the mood class)
      */
     private void updateUi() {
-        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, currentTime, "", 0));
-        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, currentTime, "", 1));
-        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, currentTime,"", 2));
-        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, currentTime, "", 3));
-        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, currentTime, "", 4));
+        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, getCurrentDate(), "", 0));
+        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, getCurrentDate(), "", 1));
+        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, getCurrentDate(),"", 2));
+        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, getCurrentDate(), "", 3));
+        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, getCurrentDate(), "", 4));
     }
 
     /**
@@ -111,19 +113,29 @@ public class MainActivity extends AppCompatActivity {
         SnapHelper snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(mRecyclerView);
 
-        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
-        if (moodArrayList == null) {
-            moodArrayList = new ArrayList<>();
-            mRecyclerView.scrollToPosition(0);
+        // Scroll the recycler view according to the last item selected today
+        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(this).retrieveMoodList();
+        if ((moodArrayList.size() > 0) && (getCurrentDate().equals(moodArrayList.get(moodArrayList.size() -1).getDate()))) {
+            mRecyclerView.scrollToPosition(moodArrayList.get(moodArrayList.size() -1).getId());
         } else {
-            positionId = moodArrayList.get(moodArrayList.size() -1).getId();
-            mRecyclerView.scrollToPosition(positionId);
+            mRecyclerView.scrollToPosition(0);
         }
 
-        // Call methods
-        if (isNewDay()) {
-            mRecyclerView.scrollToPosition(0);
-        }
+        /**
+         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
+         if (moodArrayList == null) {
+         moodArrayList = new ArrayList<>();
+         mRecyclerView.scrollToPosition(0);
+         } else {
+         positionId = moodArrayList.get(moodArrayList.size() -1).getId();
+         mRecyclerView.scrollToPosition(positionId);
+         }
+
+         // Call methods
+         if (isNewDay()) {
+         mRecyclerView.scrollToPosition(0);
+         }
+         **/
     }
 
     /**
@@ -143,8 +155,22 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "New day !");
             return true;
         }
-
         return false;
+    }
+
+    private String getCurrentDate() {
+        Date today = Calendar.getInstance().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
+        String strDate = format.format(today);
+
+        return strDate;
+        /**
+         Date date;
+         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/YYYY", Locale.getDefault());
+         date = Calendar.getInstance().getTime();
+         date = new Date(outputFormatter.format(date));
+         return date;
+         **/
     }
 
     /**
@@ -162,10 +188,15 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton(R.string.positiveBtn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(MainActivity.this).retrieveMoodList();
+                        mComment = input.getText().toString();
+                        saveMoodHelper.saveCurrentMood(moodArrayList.get(positionId));
+                        /**
                         PrefHelper.getNewInstance(getApplicationContext());
                         mComment = input.getText().toString();
                         mMoods.get(positionId).setComment(mComment);
                         saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
+                         **/
                     }
                 });
                 builder.setNegativeButton(R.string.negativeBtn, new DialogInterface.OnClickListener() {
@@ -187,10 +218,19 @@ public class MainActivity extends AppCompatActivity {
         histBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                // startActivity(intent);
-                ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
-                Log.e("SaveMoodHelper", "Array : " + moodArrayList);
+                Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                startActivity(intent);
+                /**
+                ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(MainActivity.this).retrieveMoodList();
+                // Display a toast message if there is no history yet
+                Log.e(TAG, "Size : " + moodArrayList.size());
+                if (moodArrayList.size() > 1) {
+                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "Historique inexistant. Revenez demain.", Toast.LENGTH_LONG).show();
+                }
+                 **/
             }
         });
     }
@@ -203,7 +243,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
-        Log.e(TAG, "MOOD ID : " + positionId + " - COMMENT : " + mComment);
+        mMoods.get(positionId).setComment(mComment);
+
         saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
     }
 

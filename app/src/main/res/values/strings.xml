@@ -4,4 +4,14 @@
     <string name="comment">Votre commentaire</string>
     <string name="positiveBtn">Valider</string>
     <string name="negativeBtn">Annuler</string>
+
+    <array name="history_array">
+        <item>Hier</item>
+        <item>Avant-hier</item>
+        <item>Il y a trois jours</item>
+        <item>Il y a quatre jours</item>
+        <item>Il y a cinq jours</item>
+        <item>Il y a six jours</item>
+        <item>Il y a sept jours</item>
+    </array>
 </resources>
