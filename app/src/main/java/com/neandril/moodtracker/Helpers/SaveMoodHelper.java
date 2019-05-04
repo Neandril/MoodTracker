@@ -64,6 +64,10 @@ public class SaveMoodHelper {
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
         ArrayList<Mood> moodArrayList = prefHelper.retrieveMoodList();
 
+        if (moodArrayList == null) {
+            moodArrayList = new ArrayList<>();
+        }
+
         // Remove the last item if the list is not null, and if it's the same date
         if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(getCurrentDate())) {
             moodArrayList.remove(moodArrayList.size() -1);
@@ -82,40 +86,5 @@ public class SaveMoodHelper {
         prefHelper.saveMoodList(moodArrayList);
 
         Log.e("SaveMoodHelper", "Saved ! " + moodArrayList.get(0).getComment());
-
-        // Below, older code, just a remember; will be deleted
-        /**
-        SharedPreferences preferences = context.getSharedPreferences(PREFS_MOOD, context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        ArrayList<Mood> moods = new ArrayList<>();
-        Gson gson = new Gson();
-
-        String json = gson.toJson(moods);
-        editor.putString(MOOD_LIST, json);
-        editor.apply();
-
-        Log.e("SaveMoodHelper", "Saved ! " + json);
-         **/
-    }
-
-    /**
-     * Load Preferences
-     * @param context context
-     * @return array of moods
-     */
-    public ArrayList<Mood> loadPreferences(Context context) {
-        Gson gson = new Gson();
-
-        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_MOOD, 0);
-        String json = sharedPreferences.getString(MOOD_LIST, "");
-        Type type = new TypeToken<ArrayList<Mood>>() {}.getType();
-
-        ArrayList<Mood> moods = gson.fromJson(json, type);
-
-        if (moods == null) {
-            moods = new ArrayList<>();
-        }
-
-        return moods;
     }
 }

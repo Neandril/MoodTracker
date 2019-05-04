@@ -164,13 +164,6 @@ public class MainActivity extends AppCompatActivity {
         String strDate = format.format(today);
 
         return strDate;
-        /**
-         Date date;
-         DateFormat outputFormatter = new SimpleDateFormat("MM/dd/YYYY", Locale.getDefault());
-         date = Calendar.getInstance().getTime();
-         date = new Date(outputFormatter.format(date));
-         return date;
-         **/
     }
 
     /**
@@ -190,13 +183,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(MainActivity.this).retrieveMoodList();
                         mComment = input.getText().toString();
-                        saveMoodHelper.saveCurrentMood(moodArrayList.get(positionId));
-                        /**
-                        PrefHelper.getNewInstance(getApplicationContext());
-                        mComment = input.getText().toString();
-                        mMoods.get(positionId).setComment(mComment);
-                        saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
-                         **/
+                        Mood currentMood = moodArrayList.get(positionId);
+                        currentMood.setComment(mComment);
+                        saveMoodHelper.saveCurrentMood(currentMood);
                     }
                 });
                 builder.setNegativeButton(R.string.negativeBtn, new DialogInterface.OnClickListener() {
@@ -220,17 +209,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
                 startActivity(intent);
-                /**
-                ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(MainActivity.this).retrieveMoodList();
-                // Display a toast message if there is no history yet
-                Log.e(TAG, "Size : " + moodArrayList.size());
-                if (moodArrayList.size() > 1) {
-                    Intent intent = new Intent(MainActivity.this, HistoryActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Historique inexistant. Revenez demain.", Toast.LENGTH_LONG).show();
-                }
-                 **/
             }
         });
     }

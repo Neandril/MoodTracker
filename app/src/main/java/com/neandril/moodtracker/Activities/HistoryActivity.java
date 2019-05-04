@@ -18,6 +18,7 @@ import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class HistoryActivity extends AppCompatActivity {
 
@@ -42,7 +43,7 @@ public class HistoryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history);
 
-        ArrayList<Mood> moodArrayList = prefHelper.getNewInstance(this).retrieveMoodList();
+        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(this).retrieveMoodList();
 
         Log.e(TAG, "Mood : " + moodArrayList.get(0).getId() + " - Date : " + moodArrayList.get(0).getDate() + " - Comment : " + moodArrayList.get(0).getComment());
 
@@ -56,8 +57,6 @@ public class HistoryActivity extends AppCompatActivity {
         if (moodArrayList.size() < 1) {
             Toast.makeText(this, "Historique inexistant. Revenez demain.", Toast.LENGTH_LONG).show();
         }
-
-        Log.e(TAG, "ArrayList : " + moodArrayList.size());
 
         recyclerView = (RecyclerView) findViewById(R.id.rvHist);
         button = (ImageButton) findViewById(R.id.hist_commentBtn);

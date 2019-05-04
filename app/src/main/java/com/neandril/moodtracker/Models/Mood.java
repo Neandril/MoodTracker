@@ -57,7 +57,7 @@ public class Mood {
         return comment;
     }
 
-    public void setComment(String text) {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 
