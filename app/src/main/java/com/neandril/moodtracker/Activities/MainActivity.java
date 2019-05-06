@@ -1,5 +1,8 @@
 package com.neandril.moodtracker.Activities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +22,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.neandril.moodtracker.Adapters.MoodAdapter;
+import com.neandril.moodtracker.Helpers.AlarmHelper;
+import com.neandril.moodtracker.Helpers.DateHelper;
 import com.neandril.moodtracker.Helpers.PrefHelper;
 import com.neandril.moodtracker.Helpers.SaveMoodHelper;
 import com.neandril.moodtracker.Models.Mood;
@@ -45,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private Date currentTime = Calendar.getInstance().getTime();
     private String mComment;
     private int positionId;
+    private DateHelper dateHelper;
     SaveMoodHelper saveMoodHelper;
 
     LinearLayoutManager mLinearLayoutManager;
@@ -58,40 +64,25 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         saveMoodHelper = new SaveMoodHelper(this);
-
-        /**
-         // Check if sharedpreference contains a value
-         sharedPreferences = getBaseContext().getSharedPreferences(PREFS_MOOD, MODE_PRIVATE);
-
-         if (sharedPreferences.contains(PREFS_MOOD_ID) && sharedPreferences.contains(PREFS_MOOD_COM)){
-            // If a mood was picked up, scroll to its position
-            int pos = sharedPreferences.getInt(PREFS_MOOD_ID, 0);
-            String com = sharedPreferences.getString(PREFS_MOOD_COM, "");
-            String date = sharedPreferences.getString(PREFS_MOOD_DATE, "");
-            mRecyclerView.scrollToPosition(pos);
-
-            Log.e(TAG, "Mood : " + pos + " - Commentaire : " + com + " - Date : " + date);
-
-        } else {
-            Log.e(TAG, "No sharedpreference yet");
-        }
-         **/
+        dateHelper = new DateHelper();
 
         updateUi();
         configureRecyclerView();
         configureCommentBtn();
         configureHistBtn();
+        callAlarmHelper(this);
     }
 
     /**
      * Fill the RecyclerView with diffents moods (created through the mood class)
      */
     private void updateUi() {
-        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, getCurrentDate(), "", 0));
-        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, getCurrentDate(), "", 1));
-        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, getCurrentDate(),"", 2));
-        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, getCurrentDate(), "", 3));
-        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, getCurrentDate(), "", 4));
+
+        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0));
+        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, dateHelper.getCurrentDate(), "", 1));
+        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, dateHelper.getCurrentDate(),"", 2));
+        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, dateHelper.getCurrentDate(), "", 3));
+        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, dateHelper.getCurrentDate(), "", 4));
     }
 
     /**
@@ -115,27 +106,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Scroll the recycler view according to the last item selected today
         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(this).retrieveMoodList();
-        if ((moodArrayList.size() > 0) && (getCurrentDate().equals(moodArrayList.get(moodArrayList.size() -1).getDate()))) {
+        if ((moodArrayList.size() > 0) && (dateHelper.getCurrentDate().equals(moodArrayList.get(moodArrayList.size() -1).getDate()))) {
             mRecyclerView.scrollToPosition(moodArrayList.get(moodArrayList.size() -1).getId());
         } else {
             mRecyclerView.scrollToPosition(0);
         }
-
-        /**
-         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(getApplicationContext()).retrieveMoodList();
-         if (moodArrayList == null) {
-         moodArrayList = new ArrayList<>();
-         mRecyclerView.scrollToPosition(0);
-         } else {
-         positionId = moodArrayList.get(moodArrayList.size() -1).getId();
-         mRecyclerView.scrollToPosition(positionId);
-         }
-
-         // Call methods
-         if (isNewDay()) {
-         mRecyclerView.scrollToPosition(0);
-         }
-         **/
     }
 
     /**
@@ -158,14 +133,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private String getCurrentDate() {
-        Date today = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
-        String strDate = format.format(today);
-
-        return strDate;
-    }
-
     /**
      * Add a comment button
      */
@@ -181,10 +148,10 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton(R.string.positiveBtn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(MainActivity.this).retrieveMoodList();
+                        PrefHelper.getNewInstance(MainActivity.this);
                         mComment = input.getText().toString();
-                        Mood currentMood = moodArrayList.get(positionId);
-                        currentMood.setComment(mComment);
+                        mMoods.get(positionId).setComment(mComment);
+                        Mood currentMood = mMoods.get(positionId);
                         saveMoodHelper.saveCurrentMood(currentMood);
                     }
                 });
@@ -201,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Launch history activity
-     * coming soon
      */
     private void configureHistBtn() {
         histBtn.setOnClickListener(new View.OnClickListener() {
@@ -211,6 +177,21 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void callAlarmHelper(Context context) {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+
+        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent i = new Intent(context, AlarmHelper.class);
+        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+        am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+
+        Log.e(TAG, "Alarm Triggered !!");
     }
 
     /**

@@ -27,28 +27,10 @@ public class SaveMoodHelper {
     private static SharedPreferences sPreferences;
     private static final String PREFS_MOOD = "PREFS_MOOD";
     private static final String MOOD_LIST = "MOOD_LIST";
+    private DateHelper dateHelper;
 
     public SaveMoodHelper(Context context) {
         this.context = context;
-    }
-
-    /**
-     * Get the current date
-     * @return current date
-     */
-    private String getCurrentDate() {
-        Date today = Calendar.getInstance().getTime();
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
-        String strDate = format.format(today);
-
-        return strDate;
-        /**
-        Date date;
-        DateFormat outputFormatter = new SimpleDateFormat("MM/dd/YYYY", Locale.getDefault());
-        date = Calendar.getInstance().getTime();
-        date = new Date(outputFormatter.format(date));
-        return date;
-         **/
     }
 
     /**
@@ -57,8 +39,9 @@ public class SaveMoodHelper {
      */
     public void saveCurrentMood(Mood currentMood) {
 
-        currentMood.setDate(getCurrentDate());
-        Log.e("SaveMoodHelper", getCurrentDate());
+        dateHelper = new DateHelper();
+
+        currentMood.setDate(dateHelper.getCurrentDate());
 
         // Initialize a new instance of the pref helper
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
@@ -69,7 +52,7 @@ public class SaveMoodHelper {
         }
 
         // Remove the last item if the list is not null, and if it's the same date
-        if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(getCurrentDate())) {
+        if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate())) {
             moodArrayList.remove(moodArrayList.size() -1);
         }
 

@@ -45,11 +45,10 @@ public class HistoryActivity extends AppCompatActivity {
 
         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(this).retrieveMoodList();
 
-        Log.e(TAG, "Mood : " + moodArrayList.get(0).getId() + " - Date : " + moodArrayList.get(0).getDate() + " - Comment : " + moodArrayList.get(0).getComment());
-
-        // Remove last item of the list (which is the current date)
+        // Remove last item of the list (which is the current date), and then reverse the whole list to display it on the right order
         if (moodArrayList.size() > 0) {
             moodArrayList.remove(moodArrayList.size() -1);
+            Collections.reverse(moodArrayList);
         }
 
         // Display a toast message if there is no history yet

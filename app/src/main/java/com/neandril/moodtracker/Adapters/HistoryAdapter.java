@@ -65,7 +65,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      */
     @Override
     public void onBindViewHolder(@NonNull final HistoryViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
-        Collections.reverse(mMoodList);
         Mood mood = mMoodList.get(position);
 
         // Get the metrics of the device

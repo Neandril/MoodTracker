@@ -23,12 +23,4 @@ public class HistoryViewHolder extends RecyclerView.ViewHolder {
         textView = itemview.findViewById(R.id.hist_textView);
         button = itemview.findViewById(R.id.hist_commentBtn);
     }
-
-    /**
-     * Bind the view with a mood object
-     * @param mood retrieve data to be displayed about moods
-     */
-    public void bind(final Mood mood){
-
-    }
 }
