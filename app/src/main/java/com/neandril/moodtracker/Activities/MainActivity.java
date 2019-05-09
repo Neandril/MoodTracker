@@ -12,6 +12,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private String mComment;
     private int positionId;
     private String path;
+    private Bitmap mBitmap;
     private String shareText;
     private DateHelper dateHelper;
     SaveMoodHelper saveMoodHelper;
@@ -179,36 +181,56 @@ public class MainActivity extends AppCompatActivity {
                 positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
                 switch (positionId) {
                     case 0:
-                        path = "com.neandril.moodtracker/drawable/smiley_super_happy";
+                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_super_happy);
                         shareText = "je suis très content ! Ma journée va être géniale ! :D";
                         break;
                     case 1:
-                        path = "com.neandril.moodtracker/drawable/smiley_happy";
+                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_happy);
                         shareText = "je suis content, juste comme il faut pour passer une bonne journée ! :)";
                         break;
                     case 2:
-                        path = "com.neandril.moodtracker/drawable/smiley_normal";
+                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_normal);
                         shareText = "je ne ressens aucune émotion particulière, je ne sais pas trop quoi penser... :|";
                         break;
                     case 3:
-                        path = "com.neandril.moodtracker/drawable/smiley_disappointed";
+                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_disappointed);
                         shareText = "je suis assez mécontent aujourd'hui ! Hâte que la journée se termine. :/";
                         break;
                     case 4:
-                        path = "com.neandril.moodtracker/drawable/smiley_sad";
+                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_sad);
                         shareText = "je suis en colère ! Ca ne va pas du tout aujourd'hui !! :(";
                         break;
                     default:
                         break;
                 }
 
-                Intent share = new Intent(Intent.ACTION_SEND);
-                share.setType("image/*");
+                // Ignore URI Exposure
+                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                StrictMode.setVmPolicy(builder.build());
 
-                Uri imageUri = Uri.parse("android.resource://" + path);
+                path = getExternalCacheDir() + "/moodImage.png";
+
+                java.io.OutputStream out;
+                java.io.File file=new java.io.File(path);
+                try {
+                    out = new java.io.FileOutputStream(file);
+                    mBitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                path = file.getPath();
+                Uri imageUri = Uri.parse("file://" + path);
+
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                share.setType("image/*");
                 share.putExtra(Intent.EXTRA_SUBJECT, "Voici mon humeur du jour : " + shareText);
                 share.putExtra(Intent.EXTRA_STREAM,imageUri);
                 share.putExtra(Intent.EXTRA_TEXT, "Partagé via l'application MoodTracker");
+
                 startActivity(Intent.createChooser(share, "Partage avec..."));
             }
         });

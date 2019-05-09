@@ -67,7 +67,5 @@ public class SaveMoodHelper {
 
         // Finally save the array
         prefHelper.saveMoodList(moodArrayList);
-
-        Log.e("SaveMoodHelper", "Saved ! " + moodArrayList.get(0).getComment());
     }
 }
