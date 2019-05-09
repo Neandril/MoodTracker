@@ -20,12 +20,11 @@ import com.neandril.moodtracker.R;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * History activity
+ * The history is contained inside a recyclerview, like mainActivity
+ */
 public class HistoryActivity extends AppCompatActivity {
-
-    /**
-     * In dev
-     * @param savedInstanceState
-     */
 
     private ArrayList<Mood> mMoods = new ArrayList<>();
 
@@ -52,14 +51,13 @@ public class HistoryActivity extends AppCompatActivity {
         }
 
         // Display a toast message if there is no history yet
-        Log.e(TAG, "Size : " + moodArrayList.size());
         if (moodArrayList.size() < 1) {
             Toast.makeText(this, "Historique inexistant. Revenez demain.", Toast.LENGTH_LONG).show();
         }
 
-        recyclerView = (RecyclerView) findViewById(R.id.rvHist);
-        button = (ImageButton) findViewById(R.id.hist_commentBtn);
-        textView = (TextView) findViewById(R.id.hist_textView);
+        recyclerView = findViewById(R.id.rvHist);
+        button = findViewById(R.id.hist_commentBtn);
+        textView = findViewById(R.id.hist_textView);
 
         // Define layoutManager
         mLinearLayoutManager = new LinearLayoutManager(this);

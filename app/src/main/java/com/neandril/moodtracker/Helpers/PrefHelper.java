@@ -9,12 +9,13 @@ import com.neandril.moodtracker.Models.Mood;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Class which helps to create preferences with Json
  * Used to send back the Json to the SaveMoodHelper class
  */
+
+// TODO: If possible, merge this class inside SaveMoodHelper
 
 public class PrefHelper {
 

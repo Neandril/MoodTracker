@@ -6,8 +6,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -47,9 +53,11 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Mood> mMoods = new ArrayList<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
-    private Date currentTime = Calendar.getInstance().getTime();
+    private ImageButton shareBtn;
     private String mComment;
     private int positionId;
+    private String path;
+    private String shareText;
     private DateHelper dateHelper;
     SaveMoodHelper saveMoodHelper;
 
@@ -70,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         configureRecyclerView();
         configureCommentBtn();
         configureHistBtn();
+        configureShareBtn();
         callAlarmHelper(this);
     }
 
@@ -77,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
      * Fill the RecyclerView with diffents moods (created through the mood class)
      */
     private void updateUi() {
-
         mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0));
         mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, dateHelper.getCurrentDate(), "", 1));
         mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, dateHelper.getCurrentDate(),"", 2));
@@ -89,9 +97,10 @@ public class MainActivity extends AppCompatActivity {
      * Method configuring the RecyclerView
      */
     private void configureRecyclerView() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.rvMoods);
-        commentBtn = (ImageButton) findViewById(R.id.commentBtn);
-        histBtn = (ImageButton) findViewById(R.id.historyBtn);
+        mRecyclerView = findViewById(R.id.rvMoods);
+        commentBtn = findViewById(R.id.commentBtn);
+        histBtn = findViewById(R.id.historyBtn);
+        shareBtn = findViewById(R.id.shareBtn);
 
         // Define layoutManager
         mLinearLayoutManager = new LinearLayoutManager(this);
@@ -111,26 +120,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mRecyclerView.scrollToPosition(0);
         }
-    }
-
-    /**
-     * Check if a new day begins
-     */
-    private boolean isNewDay() {
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastTimeStarted = settings.getInt("last_time_started", -1);
-        Calendar calendar = Calendar.getInstance();
-        int today = calendar.get(Calendar.DAY_OF_YEAR);
-
-        if (today != lastTimeStarted) {
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putInt("last_time_started", today);
-            editor.apply();
-
-            Log.e(TAG, "New day !");
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -179,6 +168,57 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Share button : display an option picker for sharing current mood
+     * (by mail, sms, social networks, etc.)
+     */
+    private void configureShareBtn() {
+        shareBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
+                switch (positionId) {
+                    case 0:
+                        path = "com.neandril.moodtracker/drawable/smiley_super_happy";
+                        shareText = "je suis très content ! Ma journée va être géniale ! :D";
+                        break;
+                    case 1:
+                        path = "com.neandril.moodtracker/drawable/smiley_happy";
+                        shareText = "je suis content, juste comme il faut pour passer une bonne journée ! :)";
+                        break;
+                    case 2:
+                        path = "com.neandril.moodtracker/drawable/smiley_normal";
+                        shareText = "je ne ressens aucune émotion particulière, je ne sais pas trop quoi penser... :|";
+                        break;
+                    case 3:
+                        path = "com.neandril.moodtracker/drawable/smiley_disappointed";
+                        shareText = "je suis assez mécontent aujourd'hui ! Hâte que la journée se termine. :/";
+                        break;
+                    case 4:
+                        path = "com.neandril.moodtracker/drawable/smiley_sad";
+                        shareText = "je suis en colère ! Ca ne va pas du tout aujourd'hui !! :(";
+                        break;
+                    default:
+                        break;
+                }
+
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("image/*");
+
+                Uri imageUri = Uri.parse("android.resource://" + path);
+                share.putExtra(Intent.EXTRA_SUBJECT, "Voici mon humeur du jour : " + shareText);
+                share.putExtra(Intent.EXTRA_STREAM,imageUri);
+                share.putExtra(Intent.EXTRA_TEXT, "Partagé via l'application MoodTracker");
+                startActivity(Intent.createChooser(share, "Partage avec..."));
+            }
+        });
+    }
+
+    /**
+     * Call the alarm helper each day at midnight
+     * (through a service)
+     * @param context context
+     */
     private void callAlarmHelper(Context context) {
         Calendar calendar = Calendar.getInstance();
 
@@ -186,18 +226,18 @@ public class MainActivity extends AppCompatActivity {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
 
-        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent i = new Intent(context, AlarmHelper.class);
-        PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-        am.setRepeating(AlarmManager.RTC, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, i, 0);
 
-        Log.e(TAG, "Alarm Triggered !!");
+        if (alarmManager != null) {
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        }
     }
 
     /**
      * Life cycle methods
      */
-    // When paused
     @Override
     protected void onPause() {
         super.onPause();
@@ -207,13 +247,11 @@ public class MainActivity extends AppCompatActivity {
         saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
     }
 
-    // When destroyed
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
-    /**
-     *
-     */
+    @Override
+    protected void onResume() { super.onResume(); }
 }

@@ -3,6 +3,7 @@ package com.neandril.moodtracker.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Point;
 import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -37,9 +38,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
 
     private Activity mActivity;
 
-    private double deviceWidth;
-    private double deviceHeight;
-
     // Constructor with a list as a param
     public HistoryAdapter(Activity activity, ArrayList<Mood> list) {
         mActivity = activity;
@@ -65,20 +63,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      */
     @Override
     public void onBindViewHolder(@NonNull final HistoryViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
+        // TODO: Compute the heigh of the device WITHOUT action bar
         Mood mood = mMoodList.get(position);
 
         // Get the metrics of the device
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-        deviceWidth = displayMetrics.widthPixels;
-        deviceHeight = displayMetrics.heightPixels;
+        double deviceWidth = displayMetrics.widthPixels;
+        // double deviceHeight = displayMetrics.heightPixels;
 
         // Value to set the width per percent of the screen
         final double [] textViewWidthComputing = {1, 0.8, 0.6, 0.4,  0.25};
 
         ViewGroup.LayoutParams param = viewHolder.relativeLayout.getLayoutParams();
         param.width = (int) (deviceWidth * textViewWidthComputing[mood.getId()]);
+        // param.height = (int) deviceHeight / 7;
         viewHolder.relativeLayout.setLayoutParams(param);
 
         // Set the background
