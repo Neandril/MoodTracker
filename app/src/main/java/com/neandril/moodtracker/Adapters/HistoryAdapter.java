@@ -3,12 +3,14 @@ package com.neandril.moodtracker.Adapters;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,8 +52,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      * @param itemType - items
      * @return
      */
+    @NonNull
     @Override
-    public HistoryViewHolder onCreateViewHolder(ViewGroup viewGroup, int itemType) {
+    public HistoryViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int itemType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_history,viewGroup,false);
         return new HistoryViewHolder(view);
     }
@@ -63,7 +66,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      */
     @Override
     public void onBindViewHolder(@NonNull final HistoryViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
-        // TODO: Compute the heigh of the device WITHOUT action bar
         Mood mood = mMoodList.get(position);
 
         // Get the metrics of the device
@@ -71,14 +73,22 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
         WindowManager windowManager = (WindowManager) mActivity.getSystemService(Context.WINDOW_SERVICE);
         windowManager.getDefaultDisplay().getMetrics(displayMetrics);
         double deviceWidth = displayMetrics.widthPixels;
-        // double deviceHeight = displayMetrics.heightPixels;
+        double deviceHeight = displayMetrics.heightPixels;
+
+        // Get the height of the action bar
+        int [] textSizeAttr = new int[] {R.attr.actionBarSize};
+        TypedArray a = mActivity.obtainStyledAttributes(new TypedValue().data, textSizeAttr);
+        int actionbarHeight = a.getDimensionPixelSize(0,0);
+        a.recycle();
+        // Total visible height equals to deviceHeight minus actionbarHeight
+        deviceHeight = deviceHeight - actionbarHeight;
 
         // Value to set the width per percent of the screen
-        final double [] textViewWidthComputing = {1, 0.8, 0.6, 0.4,  0.25};
+        final double [] textViewWidthComputing = {1, 0.8, 0.6, 0.4, 0.25};
 
         ViewGroup.LayoutParams param = viewHolder.relativeLayout.getLayoutParams();
         param.width = (int) (deviceWidth * textViewWidthComputing[mood.getId()]);
-        // param.height = (int) deviceHeight / 7;
+        param.height = (int) deviceHeight / 7;
         viewHolder.relativeLayout.setLayoutParams(param);
 
         // Set the background
@@ -88,9 +98,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
         String array[] = mActivity.getResources().getStringArray(R.array.history_array);
         viewHolder.textView.setText(array[position]);
 
-        Log.e("HistoryAdapter", "DATE : " + mMoodList.get(position).getDate());
-
-        // Display the button if a comment is stored
+        // Display the button if a comment is stored, and show it inside a Toast
         String comment = mMoodList.get(position).getComment();
         if (comment == null || comment.isEmpty()) {
             viewHolder.button.setVisibility(View.INVISIBLE);
@@ -108,7 +116,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
     /**
      * Mandatory method inside the adapter, used to know
      * how many items are in the recyclerview
-     * @return
+     * @return return items count
      */
     @Override
     public int getItemCount() {
