@@ -4,34 +4,21 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Point;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.neandril.moodtracker.Activities.HistoryActivity;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 import com.neandril.moodtracker.Views.HistoryViewHolder;
-import com.neandril.moodtracker.Views.RecyclerViewHolder;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
 
@@ -50,7 +37,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      * Create ViewHolders, and inflate the view
      * @param viewGroup - View displaying the list (according to the xml file)
      * @param itemType - items
-     * @return
+     * @return return the viewholder
      */
     @NonNull
     @Override
@@ -95,7 +82,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
         viewHolder.textView.setBackgroundResource(mood.getBackground());
 
         // Set the "x days ago" inside the textview
-        String array[] = mActivity.getResources().getStringArray(R.array.history_array);
+        String[] array = mActivity.getResources().getStringArray(R.array.history_array);
         viewHolder.textView.setText(array[position]);
 
         // Display the button if a comment is stored, and show it inside a Toast

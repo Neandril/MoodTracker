@@ -1,5 +1,6 @@
 package com.neandril.moodtracker.Adapters;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,9 +19,7 @@ import java.util.List;
 public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     // Store Moods infos into a list
-    List<Mood> mMoodList;
-
-    public static final String TAG = "MainActivity";
+    private List<Mood> mMoodList;
 
     // Constructor with a list as a param
     public MoodAdapter(List<Mood> list) {
@@ -31,10 +30,11 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
      * Create ViewHolders, and inflate the view
      * @param viewGroup - View displaying the list (according to the xml file)
      * @param itemType - items
-     * @return
+     * @return return the viewholder
      */
+    @NonNull
     @Override
-    public RecyclerViewHolder onCreateViewHolder(ViewGroup viewGroup, int itemType) {
+    public RecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int itemType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_mood,viewGroup,false);
         return new RecyclerViewHolder(view);
     }
@@ -45,7 +45,7 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
      * @param position - identifier of the position of the view inside the viewholder
      */
     @Override
-    public void onBindViewHolder(RecyclerViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerViewHolder viewHolder, int position) {
         Mood myObject = mMoodList.get(position);
         viewHolder.bind(myObject);
     }
@@ -53,7 +53,7 @@ public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     /**
      * Mandatory method inside the adapter, used to know
      * how many items are in the recyclerview
-     * @return
+     * @return return the list size
      */
     @Override
     public int getItemCount() {

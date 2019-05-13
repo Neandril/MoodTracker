@@ -5,43 +5,30 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.preference.PreferenceManager;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.neandril.moodtracker.Adapters.MoodAdapter;
 import com.neandril.moodtracker.Helpers.AlarmHelper;
 import com.neandril.moodtracker.Helpers.DateHelper;
 import com.neandril.moodtracker.Helpers.PrefHelper;
-import com.neandril.moodtracker.Helpers.SaveMoodHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Entry point of the app
@@ -49,8 +36,6 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Declarations
-    private RecyclerView mRecyclerView;
     private ArrayList<Mood> mMoods = new ArrayList<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
@@ -61,19 +46,15 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap mBitmap;
     private String shareText;
     private DateHelper dateHelper;
-    SaveMoodHelper saveMoodHelper;
-
+    private PrefHelper prefHelper;
     LinearLayoutManager mLinearLayoutManager;
-
-    // Tag for activity's log
-    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        saveMoodHelper = new SaveMoodHelper(this);
+        prefHelper = new PrefHelper(this);
         dateHelper = new DateHelper();
 
         updateUi();
@@ -99,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
      * Method configuring the RecyclerView
      */
     private void configureRecyclerView() {
-        mRecyclerView = findViewById(R.id.rvMoods);
+        // Declarations
+        RecyclerView mRecyclerView = findViewById(R.id.rvMoods);
         commentBtn = findViewById(R.id.commentBtn);
         histBtn = findViewById(R.id.historyBtn);
         shareBtn = findViewById(R.id.shareBtn);
@@ -143,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                         mComment = input.getText().toString();
                         mMoods.get(positionId).setComment(mComment);
                         Mood currentMood = mMoods.get(positionId);
-                        saveMoodHelper.saveCurrentMood(currentMood);
+                        prefHelper.saveCurrentMood(currentMood);
                     }
                 });
                 builder.setNegativeButton(R.string.negativeBtn, new DialogInterface.OnClickListener() {
@@ -266,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
         positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
         mMoods.get(positionId).setComment(mComment);
 
-        saveMoodHelper.saveCurrentMood(mMoods.get(positionId));
+        prefHelper.saveCurrentMood(mMoods.get(positionId));
     }
 
     @Override
@@ -274,6 +256,23 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /**
+     * Configure the onResume method
+     * Refresh the app itself if it is not closed
+     */
     @Override
-    protected void onResume() { super.onResume(); }
+    protected void onResume() {
+        super.onResume();
+
+        setContentView(R.layout.activity_main);
+
+        prefHelper = new PrefHelper(this);
+        dateHelper = new DateHelper();
+
+        configureRecyclerView();
+        configureCommentBtn();
+        configureHistBtn();
+        configureShareBtn();
+        callAlarmHelper(this);
+    }
 }

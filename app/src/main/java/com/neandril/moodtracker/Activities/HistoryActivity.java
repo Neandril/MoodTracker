@@ -1,18 +1,12 @@
 package com.neandril.moodtracker.Activities;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.neandril.moodtracker.Adapters.HistoryAdapter;
-import com.neandril.moodtracker.Adapters.MoodAdapter;
 import com.neandril.moodtracker.Helpers.PrefHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
@@ -26,16 +20,7 @@ import java.util.Collections;
  */
 public class HistoryActivity extends AppCompatActivity {
 
-    private ArrayList<Mood> mMoods = new ArrayList<>();
-
-    private RecyclerView recyclerView;
-    private ImageButton button;
-    private TextView textView;
-    private PrefHelper prefHelper;
-
     LinearLayoutManager mLinearLayoutManager;
-
-    public static final String TAG = "HistoryActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +40,7 @@ public class HistoryActivity extends AppCompatActivity {
             Toast.makeText(this, "Historique inexistant. Revenez demain.", Toast.LENGTH_LONG).show();
         }
 
-        recyclerView = findViewById(R.id.rvHist);
-        button = findViewById(R.id.hist_commentBtn);
-        textView = findViewById(R.id.hist_textView);
+        RecyclerView recyclerView = findViewById(R.id.rvHist);
 
         // Define layoutManager
         mLinearLayoutManager = new LinearLayoutManager(this);

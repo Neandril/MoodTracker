@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
@@ -17,8 +16,6 @@ public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
     private ImageView mImageView;
     private RelativeLayout mRelativeLayout;
-
-    public static final String TAG = "MainActivity";
 
     // Init the view for one cell ...
     public RecyclerViewHolder(View itemView) {

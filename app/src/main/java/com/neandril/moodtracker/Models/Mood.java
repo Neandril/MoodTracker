@@ -1,7 +1,5 @@
 package com.neandril.moodtracker.Models;
 
-import java.util.Date;
-
 /**
  * Class used to create moods
  * @smiley - The mood picture displayed
@@ -33,16 +31,8 @@ public class Mood {
         return icon;
     }
 
-    public void setIcon(int icon) {
-        this.icon = icon;
-    }
-
     public int getBackground() {
         return background;
-    }
-
-    public void setBackground(int background) {
-        this.background = background;
     }
 
     public String getDate() {
@@ -65,7 +55,4 @@ public class Mood {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
 }

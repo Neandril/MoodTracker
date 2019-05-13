@@ -2,12 +2,10 @@ package com.neandril.moodtracker.Views;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
 public class HistoryViewHolder extends RecyclerView.ViewHolder {

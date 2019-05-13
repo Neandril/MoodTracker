@@ -4,12 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.neandril.moodtracker.Models.Mood;
-
-import java.util.ArrayList;
 
 /**
  * Creation of AlarmManager instead of JobScheduler,
