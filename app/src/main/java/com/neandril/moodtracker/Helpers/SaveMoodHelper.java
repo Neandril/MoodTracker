@@ -23,10 +23,6 @@ import java.util.Locale;
 public class SaveMoodHelper {
 
     private Context context;
-    private SaveMoodHelper instance;
-    private static SharedPreferences sPreferences;
-    private static final String PREFS_MOOD = "PREFS_MOOD";
-    private static final String MOOD_LIST = "MOOD_LIST";
     private DateHelper dateHelper;
 
     public SaveMoodHelper(Context context) {

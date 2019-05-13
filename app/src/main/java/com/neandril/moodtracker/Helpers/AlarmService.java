@@ -4,16 +4,15 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
 
 /**
  * Create a service allowing the alarm to work if app is closed
  */
-
 public class AlarmService extends Service {
 
     @Override
@@ -27,23 +26,27 @@ public class AlarmService extends Service {
      * @param context context
      */
     private void CallTask(Context context){
+        DateHelper dateHelper = new DateHelper();
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
         ArrayList<Mood> moodArrayList = prefHelper.retrieveMoodList();
 
+        // If the array is null or empty, create a new one
         if (moodArrayList == null || moodArrayList.isEmpty()) {
             moodArrayList = new ArrayList<>();
         }
 
-        // Remove the last item if the list is not null, and if it's the same date
-        DateHelper dateHelper = new DateHelper();
-        if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate())) {
-            moodArrayList.remove(moodArrayList.size() -1);
+        // If the array isn't emptyn and the date not equals to current date, create a new default mood and add it to the array
+        if (moodArrayList.size() > 0 && (!(moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate()))) {
+            Mood defaultMood = new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0);
+            moodArrayList.add(defaultMood);
         }
 
+        // If the array contains more than 7 entries, delete last one
         if (moodArrayList.size() > 7 ) {
             moodArrayList.remove(0);
         }
 
+        // Save the mood (i.e. the default one)
         prefHelper.saveMoodList(moodArrayList);
     }
 
