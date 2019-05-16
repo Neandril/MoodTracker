@@ -1,34 +1,35 @@
 package com.neandril.moodtracker.Activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.neandril.moodtracker.Adapters.MoodAdapter;
-import com.neandril.moodtracker.Helpers.AlarmHelper;
+import com.neandril.moodtracker.Helpers.AlarmService;
 import com.neandril.moodtracker.Helpers.DateHelper;
 import com.neandril.moodtracker.Helpers.PrefHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Entry point of the app
@@ -36,6 +37,7 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Declarations
     private ArrayList<Mood> mMoods = new ArrayList<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
@@ -47,12 +49,18 @@ public class MainActivity extends AppCompatActivity {
     private String shareText;
     private DateHelper dateHelper;
     private PrefHelper prefHelper;
+    Intent mServiceIntent;
     LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Start the service
+        AlarmService alarmService = new AlarmService();
+        mServiceIntent = new Intent(this, alarmService.getClass());
+        ContextCompat.startForegroundService(this, mServiceIntent);
 
         prefHelper = new PrefHelper(this);
         dateHelper = new DateHelper();
@@ -62,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         configureCommentBtn();
         configureHistBtn();
         configureShareBtn();
-        callAlarmHelper(this);
     }
 
     /**
@@ -80,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
      * Method configuring the RecyclerView
      */
     private void configureRecyclerView() {
-        // Declarations
+        // Initialisation
         RecyclerView mRecyclerView = findViewById(R.id.rvMoods);
         commentBtn = findViewById(R.id.commentBtn);
         histBtn = findViewById(R.id.historyBtn);
@@ -218,41 +225,46 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Call the alarm helper each day at midnight
-     * (through a service)
-     * @param context context
-     */
-    private void callAlarmHelper(Context context) {
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context, AlarmHelper.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, i, 0);
-
-        if (alarmManager != null) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.e ("isMyServiceRunning?", true+"");
+                return true;
+            }
         }
+        Log.e ("isMyServiceRunning?", false+"");
+        return false;
     }
 
     /**
+     *
      * Life cycle methods
+     *
+     */
+
+    /**
+     * Configure the onPause method to save mood if the app is just paused
      */
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("MainActivity", "onPause");
         positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
         mMoods.get(positionId).setComment(mComment);
 
         prefHelper.saveCurrentMood(mMoods.get(positionId));
     }
 
+    /**
+     * Stop the service when app is destroyed.
+     * If we do not stop it, the service will die with the app.
+     * By stopping the service, we will force the service to call its own onDestroy which will force it to recreate itself after the app is dead
+     */
     @Override
     protected void onDestroy() {
+        stopService(mServiceIntent);
+        Log.d("MainActivity", "onDestroy");
         super.onDestroy();
     }
 
@@ -263,16 +275,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.d("MainActivity", "onResume");
         setContentView(R.layout.activity_main);
-
-        prefHelper = new PrefHelper(this);
-        dateHelper = new DateHelper();
 
         configureRecyclerView();
         configureCommentBtn();
         configureHistBtn();
         configureShareBtn();
-        callAlarmHelper(this);
     }
 }

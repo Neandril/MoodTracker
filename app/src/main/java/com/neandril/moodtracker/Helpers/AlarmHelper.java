@@ -1,9 +1,15 @@
 package com.neandril.moodtracker.Helpers;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.ContextCompat;
+import android.os.Build;
+
+import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.R;
+
+import java.util.ArrayList;
 
 /**
  * Creation of AlarmManager instead of JobScheduler,
@@ -12,18 +18,43 @@ import android.support.v4.content.ContextCompat;
  */
 public class AlarmHelper extends BroadcastReceiver {
 
-    public AlarmHelper() {
-
-    }
-
     /**
-     * When alarm is received, run the service intent
+     * When alarm is received, run the service intent, and save a default mood or current mood (depending...)
+     * Since Oreo, the service runs in foreground
+     * https://developer.android.com/about/versions/oreo/android-8.0-changes
      * @param context context
      * @param intent the intent
      */
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(Context context, Intent intent) {
-        intent = new Intent(context, AlarmService.class);
-        ContextCompat.startForegroundService(context, intent); // ContextCompat : for compatibility before Oreo
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, AlarmService.class));
+        } else {
+            context.startService(new Intent(context, AlarmService.class));
+        }
+
+        DateHelper dateHelper = new DateHelper();
+        PrefHelper prefHelper = PrefHelper.getNewInstance(context);
+        ArrayList<Mood> moodArrayList = prefHelper.retrieveMoodList();
+
+        // If the array is null or empty, create a new one
+        if (moodArrayList == null || moodArrayList.isEmpty()) {
+            moodArrayList = new ArrayList<>();
+        }
+
+        // If the array isn't empty and the date not equals to current date, create a new default mood and add it to the array
+        if (moodArrayList.size() > 0 && (!(moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate()))) {
+            Mood defaultMood = new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0);
+            moodArrayList.add(defaultMood);
+        }
+
+        // If the array contains more than 8 entries, delete last one
+        if (moodArrayList.size() > 8 ) {
+            moodArrayList.remove(0);
+        }
+
+        // Save the mood (i.e. the default one)
+        prefHelper.saveMoodList(moodArrayList);
     }
 }
