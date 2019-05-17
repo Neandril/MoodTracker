@@ -5,6 +5,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Class for retrieve current date from anywhere easily
+ */
 public class DateHelper {
 
     public DateHelper() {

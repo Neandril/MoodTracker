@@ -3,7 +3,6 @@
     package="com.neandril.moodtracker">
 
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
@@ -22,10 +21,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.HistoryActivity" />
-        <service
-            android:name=".Helpers.AlarmService"
-            android:enabled="true"
-            android:exported="true"/>
         <receiver
             android:name=".Helpers.AlarmHelper"
             android:enabled="true"

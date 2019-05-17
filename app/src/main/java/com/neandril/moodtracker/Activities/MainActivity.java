@@ -1,16 +1,14 @@
 package com.neandril.moodtracker.Activities;
 
-import android.app.ActivityManager;
-import android.content.Context;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,19 +21,22 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.neandril.moodtracker.Adapters.MoodAdapter;
-import com.neandril.moodtracker.Helpers.AlarmService;
+import com.neandril.moodtracker.Helpers.AlarmHelper;
 import com.neandril.moodtracker.Helpers.DateHelper;
 import com.neandril.moodtracker.Helpers.PrefHelper;
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Entry point of the app
  */
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final int REQUEST_CODE=101;
 
     // Declarations
     private ArrayList<Mood> mMoods = new ArrayList<>();
@@ -49,18 +50,12 @@ public class MainActivity extends AppCompatActivity {
     private String shareText;
     private DateHelper dateHelper;
     private PrefHelper prefHelper;
-    Intent mServiceIntent;
     LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Start the service
-        AlarmService alarmService = new AlarmService();
-        mServiceIntent = new Intent(this, alarmService.getClass());
-        ContextCompat.startForegroundService(this, mServiceIntent);
 
         prefHelper = new PrefHelper(this);
         dateHelper = new DateHelper();
@@ -70,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         configureCommentBtn();
         configureHistBtn();
         configureShareBtn();
+        callAlarm();
     }
 
     /**
@@ -225,22 +221,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.e ("isMyServiceRunning?", true+"");
-                return true;
-            }
-        }
-        Log.e ("isMyServiceRunning?", false+"");
-        return false;
+    /**
+     * Method calling the alarm, everyday at 23:59:59.
+     */
+    private void callAlarm() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmHelper.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
-    /**
-     *
-     * Life cycle methods
-     *
+    /*
+      Life cycle methods
      */
 
     /**
@@ -256,14 +255,8 @@ public class MainActivity extends AppCompatActivity {
         prefHelper.saveCurrentMood(mMoods.get(positionId));
     }
 
-    /**
-     * Stop the service when app is destroyed.
-     * If we do not stop it, the service will die with the app.
-     * By stopping the service, we will force the service to call its own onDestroy which will force it to recreate itself after the app is dead
-     */
     @Override
     protected void onDestroy() {
-        stopService(mServiceIntent);
         Log.d("MainActivity", "onDestroy");
         super.onDestroy();
     }

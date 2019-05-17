@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.util.Log;
 
 import com.neandril.moodtracker.Models.Mood;
 import com.neandril.moodtracker.R;
@@ -19,20 +19,15 @@ import java.util.ArrayList;
 public class AlarmHelper extends BroadcastReceiver {
 
     /**
-     * When alarm is received, run the service intent, and save a default mood or current mood (depending...)
-     * Since Oreo, the service runs in foreground
-     * https://developer.android.com/about/versions/oreo/android-8.0-changes
+     * When alarm is received, save a default mood or current mood (depending...)
      * @param context context
      * @param intent the intent
      */
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.O) {
-            context.startForegroundService(new Intent(context, AlarmService.class));
-        } else {
-            context.startService(new Intent(context, AlarmService.class));
-        }
+
+        Log.e("Alarm", "Alarm Triggered");
 
         DateHelper dateHelper = new DateHelper();
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
