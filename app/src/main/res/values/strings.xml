@@ -5,6 +5,12 @@
     <string name="positiveBtn">Valider</string>
     <string name="negativeBtn">Annuler</string>
 
+    <string name="imsuperhappy">je suis très content ! Ma journée va être géniale ! :D</string>
+    <string name="imhappy">je suis content, juste comme il faut pour passer une bonne journée ! :)</string>
+    <string name="imnormal">je ne ressens aucune émotion particulière, je ne sais pas trop quoi penser... :|</string>
+    <string name="imdisappointed">je suis assez mécontent aujourd\'hui ! Hâte que la journée se termine. :/</string>
+    <string name="imsad">je suis en colère ! Ca ne va pas du tout aujourd\'hui !! :(</string>
+
     <array name="history_array">
         <item>Hier</item>
         <item>Avant-hier</item>
@@ -14,4 +20,6 @@
         <item>Il y a six jours</item>
         <item>Il y a sept jours</item>
     </array>
+
+
 </resources>

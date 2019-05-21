@@ -13,7 +13,7 @@ public class DateHelper {
     public DateHelper() {
     }
 
-    public String getCurrentDate() {
+    public static String getCurrentDate() {
         Date today = Calendar.getInstance().getTime();
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
 

@@ -37,8 +37,6 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final int REQUEST_CODE=101;
-
     // Declarations
     private ArrayList<Mood> mMoods = new ArrayList<>();
     private ImageButton commentBtn;
@@ -49,8 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private String path;
     private Bitmap mBitmap;
     private String shareText;
-    private DateHelper dateHelper;
     private PrefHelper prefHelper;
+    final String currentDate = DateHelper.getCurrentDate();
+
     LinearLayoutManager mLinearLayoutManager;
 
     @Override
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
         Log.e("MainActivity", "onCreate");
 
         prefHelper = new PrefHelper(this);
-        dateHelper = new DateHelper();
 
         // Other methods are in onResume
         updateUi();
@@ -72,11 +70,12 @@ public class MainActivity extends AppCompatActivity {
      * Fill the RecyclerView with diffents moods (created through the mood class)
      */
     private void updateUi() {
-        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0));
-        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, dateHelper.getCurrentDate(), "", 1));
-        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, dateHelper.getCurrentDate(),"", 2));
-        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, dateHelper.getCurrentDate(), "", 3));
-        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, dateHelper.getCurrentDate(), "", 4));
+        mMoods.clear();
+        mMoods.add(new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, currentDate, "", 0));
+        mMoods.add(new Mood(R.drawable.smiley_happy, R.color.light_sage, currentDate, "", 1));
+        mMoods.add(new Mood(R.drawable.smiley_normal, R.color.cornflower_blue_65, currentDate,"", 2));
+        mMoods.add(new Mood(R.drawable.smiley_disappointed, R.color.warm_grey, currentDate, "", 3));
+        mMoods.add(new Mood(R.drawable.smiley_sad, R.color.faded_red, currentDate, "", 4));
     }
 
     /**
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Scroll the recycler view according to the last item selected today
         ArrayList<Mood> moodArrayList = PrefHelper.getNewInstance(this).retrieveMoodList();
-        if ((moodArrayList.size() > 0) && (dateHelper.getCurrentDate().equals(moodArrayList.get(moodArrayList.size() -1).getDate()))) {
+        if ((moodArrayList.size() > 0) && (currentDate.equals(moodArrayList.get(moodArrayList.size() -1).getDate()))) {
             mRecyclerView.scrollToPosition(moodArrayList.get(moodArrayList.size() -1).getId());
         } else {
             mRecyclerView.scrollToPosition(0);
@@ -167,23 +166,23 @@ public class MainActivity extends AppCompatActivity {
                 switch (positionId) {
                     case 0:
                         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_super_happy);
-                        shareText = "je suis très content ! Ma journée va être géniale ! :D";
+                        shareText = getResources().getString(R.string.imsuperhappy);
                         break;
                     case 1:
                         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_happy);
-                        shareText = "je suis content, juste comme il faut pour passer une bonne journée ! :)";
+                        shareText = getResources().getString(R.string.imhappy);
                         break;
                     case 2:
                         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_normal);
-                        shareText = "je ne ressens aucune émotion particulière, je ne sais pas trop quoi penser... :|";
+                        shareText = getResources().getString(R.string.imnormal);
                         break;
                     case 3:
                         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_disappointed);
-                        shareText = "je suis assez mécontent aujourd'hui ! Hâte que la journée se termine. :/";
+                        shareText = getResources().getString(R.string.imdisappointed);
                         break;
                     case 4:
                         mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_sad);
-                        shareText = "je suis en colère ! Ca ne va pas du tout aujourd'hui !! :(";
+                        shareText = getResources().getString(R.string.imdisappointed);
                         break;
                     default:
                         break;
@@ -225,15 +224,18 @@ public class MainActivity extends AppCompatActivity {
      * Method calling the alarm, everyday at 23:59:59.
      */
     private void callAlarm(Context context) {
+        AlarmManager alarmManager;
+        PendingIntent pendingIntent;
+
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
         calendar.add(Calendar.DATE, 1);
 
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmHelper.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, 0);
+        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         if (alarmManager != null) {
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);

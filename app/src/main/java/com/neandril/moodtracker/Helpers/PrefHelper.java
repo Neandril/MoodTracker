@@ -36,7 +36,7 @@ public class PrefHelper {
      */
     public static PrefHelper getNewInstance(Context context) {
         if (newInstance == null) {
-            newInstance = new PrefHelper(context);
+            newInstance = new PrefHelper(context.getApplicationContext());
         }
         return newInstance;
     }
