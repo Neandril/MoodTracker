@@ -33,7 +33,6 @@
             android:layout_margin="8dp"
             android:padding="8dp"
             app:srcCompat="@drawable/ic_share"/>
-
     </RelativeLayout>
 
     <RelativeLayout
