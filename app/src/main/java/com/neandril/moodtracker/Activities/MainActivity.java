@@ -30,6 +30,7 @@ import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 
 /**
  * Entry point of the app
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Declarations
     private ArrayList<Mood> mMoods = new ArrayList<>();
+    private HashMap<Object, String> shareInfos = new HashMap<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
     private ImageButton shareBtn;
@@ -162,31 +164,8 @@ public class MainActivity extends AppCompatActivity {
         shareBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
-                switch (positionId) {
-                    case 0:
-                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_super_happy);
-                        shareText = getResources().getString(R.string.imsuperhappy);
-                        break;
-                    case 1:
-                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_happy);
-                        shareText = getResources().getString(R.string.imhappy);
-                        break;
-                    case 2:
-                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_normal);
-                        shareText = getResources().getString(R.string.imnormal);
-                        break;
-                    case 3:
-                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_disappointed);
-                        shareText = getResources().getString(R.string.imdisappointed);
-                        break;
-                    case 4:
-                        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_sad);
-                        shareText = getResources().getString(R.string.imdisappointed);
-                        break;
-                    default:
-                        break;
-                }
+                // Retrieve share infos
+                getShareInfos().get(0);
 
                 // Ignore URI Exposure
                 StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
@@ -218,6 +197,40 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(Intent.createChooser(share, "Partage avec..."));
             }
         });
+    }
+
+    /**
+     * Method returning a Hashmap containing share infos
+     * @return - HashMap of objects (the bitmap), and a string (the share comment)
+     */
+    private HashMap<Object, String> getShareInfos() {
+        positionId = mMoods.get(mLinearLayoutManager.findLastVisibleItemPosition()).getId();
+        switch (positionId) {
+            case 0:
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_super_happy);
+                shareText = getResources().getString(R.string.imsuperhappy);
+                break;
+            case 1:
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_happy);
+                shareText = getResources().getString(R.string.imhappy);
+                break;
+            case 2:
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_normal);
+                shareText = getResources().getString(R.string.imnormal);
+                break;
+            case 3:
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_disappointed);
+                shareText = getResources().getString(R.string.imdisappointed);
+                break;
+            case 4:
+                mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.smiley_sad);
+                shareText = getResources().getString(R.string.imsad);
+                break;
+            default:
+                break;
+        }
+        shareInfos.put(mBitmap, shareText);
+        return shareInfos;
     }
 
     /**
