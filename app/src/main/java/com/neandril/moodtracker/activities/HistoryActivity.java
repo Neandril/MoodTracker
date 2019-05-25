@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Activities;
+package com.neandril.moodtracker.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,9 +6,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.neandril.moodtracker.Adapters.HistoryAdapter;
-import com.neandril.moodtracker.Helpers.PrefHelper;
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.adapters.HistoryAdapter;
+import com.neandril.moodtracker.helpers.PrefHelper;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
@@ -19,8 +19,6 @@ import java.util.Collections;
  * The history is contained inside a recyclerview, like mainActivity
  */
 public class HistoryActivity extends AppCompatActivity {
-
-    LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +41,8 @@ public class HistoryActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.rvHist);
 
         // Define layoutManager
-        mLinearLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLinearLayoutManager);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         // Attach adapter
         recyclerView.setAdapter(new HistoryAdapter(this, moodArrayList));

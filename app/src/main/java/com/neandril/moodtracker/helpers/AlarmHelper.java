@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Helpers;
+package com.neandril.moodtracker.helpers;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
@@ -29,7 +29,8 @@ public class AlarmHelper extends BroadcastReceiver {
 
         Log.e("Alarm", "Alarm Triggered");
 
-        DateHelper dateHelper = new DateHelper();
+        String currentDate = DateHelper.getCurrentDate();
+
         PrefHelper prefHelper = PrefHelper.getNewInstance(context);
         ArrayList<Mood> moodArrayList = prefHelper.retrieveMoodList();
 
@@ -39,8 +40,8 @@ public class AlarmHelper extends BroadcastReceiver {
         }
 
         // If the array isn't empty and the date not equals to current date, create a new default mood and add it to the array
-        if (moodArrayList.size() > 0 && (!(moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate()))) {
-            Mood defaultMood = new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, dateHelper.getCurrentDate(), "", 0);
+        if (moodArrayList.size() > 0 && (!(moodArrayList.get(moodArrayList.size()-1).getDate()).equals(currentDate))) {
+            Mood defaultMood = new Mood(R.drawable.smiley_super_happy, R.color.banana_yellow, currentDate, "", 0);
             moodArrayList.add(defaultMood);
         }
 

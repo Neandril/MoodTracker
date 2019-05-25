@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Models;
+package com.neandril.moodtracker.models;
 
 /**
  * Class used to create moods
@@ -10,11 +10,11 @@ package com.neandril.moodtracker.Models;
  */
 public class Mood {
 
-    private int icon;
-    private int background;
+    private final int icon;
+    private final int background;
     private String date;
     private String comment;
-    private int id;
+    private final int id;
 
     // Constructor
     public Mood(int icon, int background, String date, String comment, int id) {

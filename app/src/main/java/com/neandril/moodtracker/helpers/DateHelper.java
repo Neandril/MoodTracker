@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Helpers;
+package com.neandril.moodtracker.helpers;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -9,9 +9,6 @@ import java.util.Locale;
  * Class for retrieve current date from anywhere easily
  */
 public class DateHelper {
-
-    public DateHelper() {
-    }
 
     public static String getCurrentDate() {
         Date today = Calendar.getInstance().getTime();

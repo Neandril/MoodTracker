@@ -1,11 +1,11 @@
-package com.neandril.moodtracker.Views;
+package com.neandril.moodtracker.views;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
 
 /**
@@ -14,8 +14,8 @@ import com.neandril.moodtracker.R;
 
 public class RecyclerViewHolder extends RecyclerView.ViewHolder {
 
-    private ImageView mImageView;
-    private RelativeLayout mRelativeLayout;
+    private final ImageView mImageView;
+    private final RelativeLayout mRelativeLayout;
 
     // Init the view for one cell ...
     public RecyclerViewHolder(View itemView) {

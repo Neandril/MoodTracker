@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Adapters;
+package com.neandril.moodtracker.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -6,9 +6,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
-import com.neandril.moodtracker.Views.RecyclerViewHolder;
+import com.neandril.moodtracker.views.RecyclerViewHolder;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ import java.util.List;
 public class MoodAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
 
     // Store Moods infos into a list
-    private List<Mood> mMoodList;
+    private final List<Mood> mMoodList;
 
     // Constructor with a list as a param
     public MoodAdapter(List<Mood> list) {

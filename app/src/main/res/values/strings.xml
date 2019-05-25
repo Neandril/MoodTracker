@@ -11,6 +11,9 @@
     <string name="imnormal">je ne ressens aucune émotion particulière, je ne sais pas trop quoi penser… :|</string>
     <string name="imdisappointed">je suis assez mécontent aujourd\'hui ! Hâte que la journée se termine. :/</string>
     <string name="imsad">je suis en colère ! Ca ne va pas du tout aujourd\'hui !! :(</string>
+    <string name="strShareSubject">Voici mon humeur du jour : %1$s</string>
+    <string name="strShareExtraText">Partagé via l\'application MoodTracker</string>
+    <string name="strShareChooser">Partage avec…</string>
 
     <!-- Array of strings for the days in history -->
     <array name="history_array">

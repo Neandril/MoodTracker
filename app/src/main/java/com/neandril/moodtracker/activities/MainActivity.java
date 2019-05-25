@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Activities;
+package com.neandril.moodtracker.activities;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -21,11 +21,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.neandril.moodtracker.Adapters.MoodAdapter;
-import com.neandril.moodtracker.Helpers.AlarmHelper;
-import com.neandril.moodtracker.Helpers.DateHelper;
-import com.neandril.moodtracker.Helpers.PrefHelper;
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.adapters.MoodAdapter;
+import com.neandril.moodtracker.helpers.AlarmHelper;
+import com.neandril.moodtracker.helpers.DateHelper;
+import com.neandril.moodtracker.helpers.PrefHelper;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
 
 import java.util.ArrayList;
@@ -39,8 +39,8 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     // Declarations
-    private ArrayList<Mood> mMoods = new ArrayList<>();
-    private HashMap<Object, String> shareInfos = new HashMap<>();
+    private final ArrayList<Mood> mMoods = new ArrayList<>();
+    private final HashMap<Object, String> shareInfos = new HashMap<>();
     private ImageButton commentBtn;
     private ImageButton histBtn;
     private ImageButton shareBtn;
@@ -50,9 +50,8 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap mBitmap;
     private String shareText;
     private PrefHelper prefHelper;
-    final String currentDate = DateHelper.getCurrentDate();
-
-    LinearLayoutManager mLinearLayoutManager;
+    private final String currentDate = DateHelper.getCurrentDate();
+    private LinearLayoutManager mLinearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("MainActivity", "onCreate");
 
-        prefHelper = new PrefHelper(this);
+        prefHelper = PrefHelper.getNewInstance(this);
 
         // Other methods are in onResume
         updateUi();
@@ -190,11 +189,11 @@ public class MainActivity extends AppCompatActivity {
                 Intent share = new Intent(Intent.ACTION_SEND);
                 share.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 share.setType("image/*");
-                share.putExtra(Intent.EXTRA_SUBJECT, "Voici mon humeur du jour : " + shareText);
+                share.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.strShareSubject, shareText));
                 share.putExtra(Intent.EXTRA_STREAM,imageUri);
-                share.putExtra(Intent.EXTRA_TEXT, "Partagé via l'application MoodTracker");
+                share.putExtra(Intent.EXTRA_TEXT, getString(R.string.strShareExtraText));
 
-                startActivity(Intent.createChooser(share, "Partage avec..."));
+                startActivity(Intent.createChooser(share, getString(R.string.strShareChooser)));
             }
         });
     }

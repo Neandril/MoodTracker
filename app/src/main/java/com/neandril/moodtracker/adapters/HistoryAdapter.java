@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Adapters;
+package com.neandril.moodtracker.adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,18 +14,17 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
-import com.neandril.moodtracker.Views.HistoryViewHolder;
+import com.neandril.moodtracker.views.HistoryViewHolder;
 
 import java.util.ArrayList;
 
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
 
     // Store Moods infos into a list
-    private ArrayList<Mood> mMoodList;
-
-    private Activity mActivity;
+    private final ArrayList<Mood> mMoodList;
+    private final Activity mActivity;
 
     // Constructor with a list as a param
     public HistoryAdapter(Activity activity, ArrayList<Mood> list) {
@@ -52,8 +51,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
      * @param position - identifier of the position of the view inside the viewholder
      */
     @Override
-    public void onBindViewHolder(@NonNull final HistoryViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
-        Mood mood = mMoodList.get(position);
+    public void onBindViewHolder(@NonNull final HistoryViewHolder viewHolder, int position) {
+        Mood mood = mMoodList.get(viewHolder.getAdapterPosition());
 
         // Get the metrics of the device
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -94,7 +93,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
             viewHolder.button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(mActivity, mMoodList.get(position).getComment(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(mActivity, mMoodList.get(viewHolder.getAdapterPosition()).getComment(), Toast.LENGTH_LONG).show();
                 }
             });
         }

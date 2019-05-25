@@ -1,4 +1,4 @@
-package com.neandril.moodtracker.Helpers;
+package com.neandril.moodtracker.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.neandril.moodtracker.Models.Mood;
+import com.neandril.moodtracker.models.Mood;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -22,9 +22,9 @@ public class PrefHelper {
     private static final String MOOD_LIST = "MOOD_LIST";
     private static final String PREFS_MOOD = "PREFS_MOOD";
     private static SharedPreferences sSharedPreferences;
-    private Gson gson;
+    private final Gson gson;
 
-    public PrefHelper(Context context) {
+    private PrefHelper(Context context) {
         sSharedPreferences = context.getSharedPreferences(PREFS_MOOD, Context.MODE_PRIVATE);
         gson = new Gson();
     }
@@ -72,9 +72,8 @@ public class PrefHelper {
     }
 
     public void saveCurrentMood(Mood currentMood) {
-        DateHelper dateHelper = new DateHelper();
 
-        currentMood.setDate(dateHelper.getCurrentDate());
+        currentMood.setDate(DateHelper.getCurrentDate());
 
         // Initialize a new instance of the pref helper
         ArrayList<Mood> moodArrayList = retrieveMoodList();
@@ -84,7 +83,7 @@ public class PrefHelper {
         }
 
         // Remove the last item if the list is not null, and if it's the same date
-        if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(dateHelper.getCurrentDate())) {
+        if (moodArrayList.size() > 0 && (moodArrayList.get(moodArrayList.size()-1).getDate()).equals(DateHelper.getCurrentDate())) {
             moodArrayList.remove(moodArrayList.size() -1);
         }
 
