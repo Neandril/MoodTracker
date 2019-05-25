@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.neandril.moodtracker.activities.MainActivity;
 import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
 

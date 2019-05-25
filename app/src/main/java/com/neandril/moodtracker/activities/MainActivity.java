@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap mBitmap;
     private String shareText;
     private PrefHelper prefHelper;
-    private final String currentDate = DateHelper.getCurrentDate();
+    private String currentDate = DateHelper.getCurrentDate();
     private LinearLayoutManager mLinearLayoutManager;
 
     @Override
@@ -240,18 +240,17 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pendingIntent;
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
         calendar.add(Calendar.DATE, 1);
 
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmHelper.class);
-        pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
 
-        if (alarmManager != null) {
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-        }
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
     }
 
     /*
