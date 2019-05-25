@@ -1,6 +1,5 @@
 package com.neandril.moodtracker.adapters;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -14,8 +13,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.R;
+import com.neandril.moodtracker.models.Mood;
 import com.neandril.moodtracker.views.HistoryViewHolder;
 
 import java.util.ArrayList;
